@@ -54,7 +54,8 @@ class _AuditChecklistScreenState extends State<AuditChecklistScreen> {
 
     if (widget.user.isHoD) {
       _auditItems = DummyData.getAllAuditItems();
-      _selectedUserId = _auditItems.isNotEmpty ? _auditItems.first.userId : '';
+      // Start with empty selection to show "All Staff"
+      _selectedUserId = '';
     } else {
       _auditItems = DummyData.getAuditItemsForUser(widget.user.id);
       _selectedUserId = widget.user.id;
@@ -336,18 +337,24 @@ class _AuditChecklistScreenState extends State<AuditChecklistScreen> {
           SizedBox(
             width: 200,
             child: DropdownButtonFormField<String>(
-              value: _selectedUserId,
+              value: _selectedUserId.isEmpty ? null : _selectedUserId,
               decoration: const InputDecoration(
                 labelText: 'Select Staff',
                 prefixIcon: Icon(Icons.person),
                 isDense: true,
               ),
-              items: DummyData.users.where((u) => u.isStaff).map((user) {
-                return DropdownMenuItem<String>(
-                  value: user.id,
-                  child: Text(user.name),
-                );
-              }).toList(),
+              items: [
+                const DropdownMenuItem<String>(
+                  value: null,
+                  child: Text('All Staff'),
+                ),
+                ...DummyData.users.where((u) => u.isStaff).map((user) {
+                  return DropdownMenuItem<String>(
+                    value: user.id,
+                    child: Text(user.name),
+                  );
+                }).toList(),
+              ],
               onChanged: (value) {
                 setState(() {
                   _selectedUserId = value ?? '';
